@@ -1,5 +1,5 @@
 # InfiniGram Query Generator for Q&A Analysis
-
+**NOTE:** this repo is mega AI slop lol. 
 This script processes a CSV file containing questions and answers, extracts keywords using spaCy, and then queries an InfiniGram API endpoint to count the co-occurrence of these keywords. The goal is to analyze the relationship between the presence of question/answer components in a corpus (via InfiniGram counts) and a model's ability to answer the question.
 
 ## Features
