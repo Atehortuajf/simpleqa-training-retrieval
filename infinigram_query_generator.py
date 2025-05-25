@@ -104,14 +104,14 @@ def main():
                     processed_results.append({
                         'problem': problem, 'answer': answer, 'keywords': [],
                         'cnf_query_str': 'N/A', 'match_count': 0, 'approx': None,
-                        'ptrs_by_shard': None, 'notes': 'No keywords extracted'
+                        'notes': 'No keywords extracted'
                     })
                     continue
                 
                 print(f"  Combined unique keywords: {all_keywords_list}")
 
                 # Construct the payload for the API
-                query_string = " AND ".join(all_keywords_list)  # Join keywords with ' AND '
+                query_string = " OR ".join(all_keywords_list)  # Join keywords with ' OR '
                 payload = {
                     "index": INFINIGRAM_API_INDEX_NAME,
                     "query_type": "find_cnf",
@@ -124,27 +124,25 @@ def main():
                     result_data = response.json()
                     
                     print(f"  InfiniGram API Result: {result_data}")
-                    ptrs_by_shard_str = json.dumps(result_data.get('ptrs_by_shard'))
                     processed_results.append({
                         'problem': problem, 'answer': answer, 'keywords': ", ".join(all_keywords_list),
                         'cnf_query_str': query_string,
                         'match_count': result_data.get('cnt'),
                         'approx': result_data.get('approx'),
-                        'ptrs_by_shard': ptrs_by_shard_str,
                         'notes': f"Latency: {result_data.get('latency', 'N/A')}"
                     })
                 except requests.exceptions.Timeout:
                     print(f"  Error: API request timed out after {api_timeout_seconds} seconds.")
                     processed_results.append({
                         'problem': problem, 'answer': answer, 'keywords': ", ".join(all_keywords_list),
-                        'cnf_query_str': query_string, 'match_count': None, 'approx': None, 'ptrs_by_shard': None,
+                        'cnf_query_str': query_string, 'match_count': None, 'approx': None,
                         'notes': 'API request timed out'
                     })
                 except requests.exceptions.RequestException as e:
                     print(f"  Error during InfiniGram API query: {e}")
                     processed_results.append({
                         'problem': problem, 'answer': answer, 'keywords': ", ".join(all_keywords_list),
-                        'cnf_query_str': query_string, 'match_count': None, 'approx': None, 'ptrs_by_shard': None,
+                        'cnf_query_str': query_string, 'match_count': None, 'approx': None,
                         'notes': f'InfiniGram API query error: {str(e)}'
                     })
 
@@ -158,7 +156,7 @@ def main():
     # --- Output Results ---
     print("\n\n--- Summary of Processed Results ---")
     for res_item in processed_results:
-        print(f"  Problem: '{res_item['problem'][:50]}...' | Keywords: '{res_item['keywords']}' | Match Count: {res_item['match_count']} (Approx: {res_item['approx']}) Ptrs: {res_item.get('ptrs_by_shard', 'N/A')} {res_item['notes']}")
+        print(f"  Problem: '{res_item['problem'][:50]}...' | Keywords: '{res_item['keywords']}' | Match Count: {res_item['match_count']} (Approx: {res_item['approx']}) {res_item['notes']}")
 
     if processed_results:
         try:
